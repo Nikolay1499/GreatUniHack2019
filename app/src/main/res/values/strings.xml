@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">CarbonOffseter</string>
+    <string name="app_name">Carbon Offseter</string>
+    <string name="photo">Photo</string>
+    <string name="helloWorld">Hello World!</string>
 </resources>
