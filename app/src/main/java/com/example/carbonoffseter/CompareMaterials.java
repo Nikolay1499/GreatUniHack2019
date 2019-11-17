@@ -113,7 +113,10 @@ public class CompareMaterials {
                     name = "green";
                 }
             }
-        return ((ArrayList) listTwo).get(maxIndex != -1 ? maxIndex : 0) + " goes to " + name + " bin.";
+        if(maxIndex != -1 && name != "general waste")
+            return ((ArrayList) listTwo).get(maxIndex) + " goes to " + name + " bin.";
+        else
+            return "This goes to " + name + " bin.";
     }
 
     private class Material

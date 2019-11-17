@@ -1,15 +1,18 @@
 package com.example.carbonoffseter;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -34,45 +37,42 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivityTwo extends AppCompatActivity implements View.OnClickListener{
+public class OutputActivity extends AppCompatActivity {
 
     private static Context context;
+    private Bitmap image;
+    public static ImageView bin_image;
+    public static AssetManager assets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        MainActivityTwo.context = getApplicationContext();
-        Button btnClickMe = (Button) findViewById(R.id.button);
-        btnClickMe.setOnClickListener(MainActivityTwo.this);
-        /*try
-        {
+        setContentView(R.layout.activity_output);
+        Button btn = (Button)findViewById(R.id.backButton);
+        assets = getAssets();
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(OutputActivity.this, MainActivity.class));
+            }
+        });
+        OutputActivity.context = getApplicationContext();
+        ImageView user_image = findViewById(R.id.imageView);
+        bin_image = findViewById(R.id.binImage);
+        image = MainActivity.getImageToAnalyse();
+        user_image.setImageBitmap(image);
+        try {
             readImage();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch(IOException e)
-        {
-            System.err.println(e);
-        }*/
+        System.out.println(MainActivity.getImageToAnalyse());
 
     }
 
     public static Context getAppContext() {
-        return MainActivityTwo.context;
+        return OutputActivity.context;
     }
-
-    @Override
-    public void onClick(View v) {
-        try
-        {
-
-            readImage();
-        }
-        catch(Exception e)
-        {
-            System.err.println(e);
-        }
-    }
-
 
     public void readImage() throws IOException
     {
@@ -111,8 +111,7 @@ public class MainActivityTwo extends AppCompatActivity implements View.OnClickLi
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
             Image base64EncodedImage = new Image();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            InputStream imageStream = getResources().openRawResource(R.raw.photo);
-            Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
+            Bitmap bitmap = BitmapFactory.decodeFile(MainActivity.getFilePath());
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
             byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
@@ -137,10 +136,10 @@ public class MainActivityTwo extends AppCompatActivity implements View.OnClickLi
     }
 
     private static class LableDetectionTask extends AsyncTask<Object, Void, String> {
-        private final WeakReference<MainActivityTwo> mActivityWeakReference;
+        private final WeakReference<OutputActivity> mActivityWeakReference;
         private Vision.Images.Annotate mRequest;
 
-        LableDetectionTask(MainActivityTwo activity, Vision.Images.Annotate annotate) {
+        LableDetectionTask(OutputActivity activity, Vision.Images.Annotate annotate) {
             mActivityWeakReference = new WeakReference<>(activity);
             mRequest = annotate;
         }
@@ -161,10 +160,26 @@ public class MainActivityTwo extends AppCompatActivity implements View.OnClickLi
         }
 
         protected void onPostExecute(String result) {
-            MainActivityTwo activity = mActivityWeakReference.get();
+            OutputActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 TextView imageDetail = activity.findViewById(R.id.textView);
+                System.out.println(result);
                 String output = CompareMaterials.getMatching(result);
+                try
+                {
+                    if(output.contains("brown"))
+                        bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("brownBin.png")));
+                    else if(output.contains("blue"))
+                        bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("blueBin.png")));
+                    else if(output.contains("green"))
+                        bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("greenBin.png")));
+                    else
+                        bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("greyBin.png")));
+                }
+                catch(IOException e)
+                {
+                    System.err.println(e);
+                }
                 if(output.length() > 0)
                     output = output.substring(0, 1).toUpperCase() + output.substring(1);
                 imageDetail.setText(output);
@@ -192,5 +207,3 @@ public class MainActivityTwo extends AppCompatActivity implements View.OnClickLi
         return message.toString();
     }
 }
-
-
