@@ -45,17 +45,19 @@ public class MainActivity extends AppCompatActivity {
         btn_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 startActivity(new Intent(MainActivity.this, CamActivity.class));
             }
         });
         int currentPoints = getCurrentPoints();
         TextView currentPointsText = (TextView) findViewById(R.id.currentPointsView);
         String message = "Your current points are " + currentPoints;
+        System.out.println(message);
         currentPointsText.setText(message);
     }
 
     private int getCurrentPoints() {
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("MyFile", Context.MODE_PRIVATE);
         if (sharedPref.contains("currentPoints")){
             return sharedPref.getInt("currentPoints", 0);
         }

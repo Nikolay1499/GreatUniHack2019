@@ -60,7 +60,7 @@ public class OutputActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_output);
-        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("MyFile",Context.MODE_PRIVATE);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         filePath = extras.getString("Key");
@@ -220,7 +220,6 @@ public class OutputActivity extends AppCompatActivity {
             OutputActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 TextView imageDetail = activity.findViewById(R.id.textView);
-                System.out.println(result);
                 output = CompareMaterials.getMatching(result);
                 int points;
                 SharedPreferences.Editor editor = sharedPref.edit();
