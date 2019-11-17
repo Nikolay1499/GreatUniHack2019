@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 /app/src/main/java/com/example/carbonoffseter/SecureData.java
+/.idea/
