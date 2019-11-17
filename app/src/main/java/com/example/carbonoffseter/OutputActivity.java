@@ -5,6 +5,7 @@ import androidx.exifinterface.media.ExifInterface;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -46,8 +47,10 @@ public class OutputActivity extends AppCompatActivity {
     private static Context context;
     private static Bitmap image;
     public static ImageView bin_image;
+    public static TextView pointsText;
     public static AssetManager assets;
     public static String filePath;
+    public static SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class OutputActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_output);
+        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         filePath = extras.getString("Key");
@@ -107,6 +111,10 @@ public class OutputActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //Link the textview foor the point here
+        pointsText = (TextView)findViewById((R.id.points));
+
+
 
     }
 
@@ -208,21 +216,49 @@ public class OutputActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(String result) {
+            String output;
             OutputActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 TextView imageDetail = activity.findViewById(R.id.textView);
                 System.out.println(result);
-                String output = CompareMaterials.getMatching(result);
+                output = CompareMaterials.getMatching(result);
+                int points;
+                SharedPreferences.Editor editor = sharedPref.edit();
+                int currentPoints = sharedPref.getInt("currentPoints", 0);
                 try
                 {
-                    if(output.contains("brown"))
+                    if(output.contains("brown")){
                         bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("brownBin.png")));
-                    else if(output.contains("blue"))
+                        points =  (int) (Math.random() * 10);
+                        String message = "You earned " + points + " points!!";
+                        pointsText.setText(message);
+                    }
+
+                    else if(output.contains("blue")){
                         bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("blueBin.png")));
-                    else if(output.contains("green"))
+                        points =  (int) (Math.random() * 15);
+                        String message = "You earned " + points + " points!!";
+                        pointsText.setText(message);
+                    }
+
+                    else if(output.contains("green")){
                         bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("greenBin.png")));
-                    else
+                        points =  (int) (Math.random() * 12);
+                        String message = "You earned " + points + " points!!";
+                        pointsText.setText(message);
+                    }
+
+                    else{
                         bin_image.setImageBitmap(BitmapFactory.decodeStream(assets.open("greyBin.png")));
+                        points =  (int) (Math.random() * 3 + 2);
+                        String message = "You earned " + points + " points for trying to recycle!!";
+                        pointsText.setText(message);
+                    }
+                    currentPoints += points;
+                    editor.putInt("currentPoints", currentPoints);
+                    editor.commit();
+                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n" + currentPoints);
+
                 }
                 catch(IOException e)
                 {
@@ -233,6 +269,7 @@ public class OutputActivity extends AppCompatActivity {
                 imageDetail.setText(output);
 
             }
+
         }
     }
 
@@ -255,3 +292,4 @@ public class OutputActivity extends AppCompatActivity {
         return message.toString();
     }
 }
+

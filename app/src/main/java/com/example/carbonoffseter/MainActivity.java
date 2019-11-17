@@ -5,7 +5,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -18,6 +20,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.IOException;
 
@@ -45,6 +48,23 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, CamActivity.class));
             }
         });
+        int currentPoints = getCurrentPoints();
+        TextView currentPointsText = (TextView) findViewById(R.id.currentPointsView);
+        String message = "Your current points are " + currentPoints;
+        currentPointsText.setText(message);
+    }
+
+    private int getCurrentPoints() {
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        if (sharedPref.contains("currentPoints")){
+            return sharedPref.getInt("currentPoints", 0);
+        }
+        else {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("currentPoints", 0);
+            editor.commit();
+            return 0;
+        }
     }
 
     public static String getFilePath()
