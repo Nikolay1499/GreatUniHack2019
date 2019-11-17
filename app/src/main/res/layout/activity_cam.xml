@@ -22,9 +22,10 @@
 
     <Button
         android:id="@+id/picButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/take_picture"
+        android:background="@drawable/buttonshape"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+
         app:layout_constraintBottom_toBottomOf="@+id/texture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/texture"
