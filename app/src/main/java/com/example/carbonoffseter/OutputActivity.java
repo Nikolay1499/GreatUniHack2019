@@ -1,12 +1,14 @@
 package com.example.carbonoffseter;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.exifinterface.media.ExifInterface;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -40,7 +42,7 @@ import java.util.Locale;
 public class OutputActivity extends AppCompatActivity {
 
     private static Context context;
-    private Bitmap image;
+    private static Bitmap image;
     public static ImageView bin_image;
     public static AssetManager assets;
     public static String filePath;
@@ -62,8 +64,37 @@ public class OutputActivity extends AppCompatActivity {
         });
         OutputActivity.context = getApplicationContext();
         ImageView user_image = findViewById(R.id.imageView);
+        user_image.setRotation(0);
         bin_image = findViewById(R.id.binImage);
-        image = BitmapFactory.decodeFile(filePath);
+        Bitmap rotateImage = BitmapFactory.decodeFile(filePath);
+        ExifInterface ei = null;
+        try {
+            ei = new ExifInterface(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED);
+
+        switch(orientation) {
+
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                image = rotateImage(rotateImage, 90);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                image = rotateImage(rotateImage, 180);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                image = rotateImage(rotateImage, 270);
+                break;
+
+            case ExifInterface.ORIENTATION_NORMAL:
+            default:
+                image = rotateImage;
+        }
+
         user_image.setImageBitmap(image);
         try {
             readImage();
@@ -75,6 +106,14 @@ public class OutputActivity extends AppCompatActivity {
 
     public static Context getAppContext() {
         return OutputActivity.context;
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
     }
 
     public void readImage() throws IOException
@@ -114,7 +153,7 @@ public class OutputActivity extends AppCompatActivity {
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
             Image base64EncodedImage = new Image();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            Bitmap bitmap = image;
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
             byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
@@ -198,7 +237,7 @@ public class OutputActivity extends AppCompatActivity {
         System.out.println(labels.size());
         if (labels != null) {
             for (EntityAnnotation label : labels) {
-                if(label.getScore() > 0.5)
+                if(label.getScore() > 0.50)
                 {
                     message.append(String.format(Locale.US, "%s", label.getDescription()));
                     message.append("\n");

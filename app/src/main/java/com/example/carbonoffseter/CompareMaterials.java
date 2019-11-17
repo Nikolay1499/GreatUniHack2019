@@ -41,7 +41,13 @@ public class CompareMaterials {
     public static String getMatching(String labels)
     {
         Collection listTwo = new ArrayList<String>(Arrays.asList(labels.toLowerCase().split("\n", -1)));
-        String[] brownList = {"plastic bottle", "milk bottle", "soda bottle",
+        String[] brownList = {"plastic bottle",
+                "potato chip",
+                "snack",
+                "milk bottle",
+                "soda bottle",
+                "plastic",
+                "ball pit",
                 "washing up liquid",
                 "shampoo",
                 "mouth wash",
@@ -52,8 +58,16 @@ public class CompareMaterials {
                 "can", "drink can",
                 "foil", "tin foil", "foil tray",
                 "aerosols",
-                "glass"};
+                "glass", "glasses", "glass bottle", "bottle"};
         String[] blueList = {"cardboard",
+                "brochure",
+                "magazine",
+                "paper",
+                "sticker",
+                "carton",
+                "paper product",
+                "paper bag",
+                "shopping bag",
                 "box",
                 "carton",
                 "magazine",
@@ -67,6 +81,9 @@ public class CompareMaterials {
                 "tag",
                 "roll"};
         String[] greenList = {"food",
+                "chocolate",
+                "plant",
+                "banana",
                 "bones",
                 "tea bag", "tea",
                 "twig",
