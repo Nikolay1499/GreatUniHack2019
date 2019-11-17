@@ -1,25 +1,21 @@
 package com.example.carbonoffseter;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.vision.v1.Vision;
 import com.google.api.services.vision.v1.VisionRequest;
 import com.google.api.services.vision.v1.VisionRequestInitializer;
@@ -27,31 +23,28 @@ import com.google.api.services.vision.v1.model.AnnotateImageRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesRequest;
 import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
-import com.google.api.services.vision.v1.model.FaceAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.vision.v1.model.Image;
-import com.google.api.services.vision.v1.model.TextAnnotation;
-
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivityTwo extends AppCompatActivity implements View.OnClickListener{
+
+    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MainActivityTwo.context = getApplicationContext();
         Button btnClickMe = (Button) findViewById(R.id.button);
-        btnClickMe.setOnClickListener(MainActivity.this);
+        btnClickMe.setOnClickListener(MainActivityTwo.this);
         /*try
         {
             readImage();
@@ -63,17 +56,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public static Context getAppContext() {
+        return MainActivityTwo.context;
+    }
+
     @Override
     public void onClick(View v) {
         try
         {
+
             readImage();
         }
-        catch(IOException e)
+        catch(Exception e)
         {
             System.err.println(e);
         }
     }
+
 
     public void readImage() throws IOException
     {
@@ -82,10 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         VisionRequestInitializer requestInitializer =
                 new VisionRequestInitializer(SecureData.getKey()) {
-                    /**
-                     * We override this so we can inject important identifying fields into the HTTP
-                     * headers. This enables use of a restricted cloud platform API key.
-                     */
+
                     @Override
                     protected void initializeVisionRequest(VisionRequest<?> visionRequest)
                             throws IOException {
@@ -137,15 +133,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 vision.images().annotate(batchAnnotateImagesRequest);
         AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(this, annotateRequest);
         labelDetectionTask.execute();
-        Toast.makeText(getApplicationContext(),
-                "Hello", Toast.LENGTH_LONG).show();
+
     }
 
     private static class LableDetectionTask extends AsyncTask<Object, Void, String> {
-        private final WeakReference<MainActivity> mActivityWeakReference;
+        private final WeakReference<MainActivityTwo> mActivityWeakReference;
         private Vision.Images.Annotate mRequest;
 
-        LableDetectionTask(MainActivity activity, Vision.Images.Annotate annotate) {
+        LableDetectionTask(MainActivityTwo activity, Vision.Images.Annotate annotate) {
             mActivityWeakReference = new WeakReference<>(activity);
             mRequest = annotate;
         }
@@ -166,10 +161,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         protected void onPostExecute(String result) {
-            MainActivity activity = mActivityWeakReference.get();
+            MainActivityTwo activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 TextView imageDetail = activity.findViewById(R.id.textView);
-                imageDetail.setText(result);
+                String output = CompareMaterials.getMatching(result);
+                if(output.length() > 0)
+                    output = output.substring(0, 1).toUpperCase() + output.substring(1);
+                imageDetail.setText(output);
+
             }
         }
     }
@@ -190,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             message.append("nothing");
         }
-
         return message.toString();
     }
 }
