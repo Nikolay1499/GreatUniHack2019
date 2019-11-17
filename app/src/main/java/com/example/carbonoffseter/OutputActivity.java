@@ -1,5 +1,6 @@
 package com.example.carbonoffseter;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.exifinterface.media.ExifInterface;
 
@@ -17,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -51,6 +53,7 @@ public class OutputActivity extends AppCompatActivity {
     public static AssetManager assets;
     public static String filePath;
     public static SharedPreferences sharedPref;
+    public static RatingBar bar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,9 @@ public class OutputActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_output);
         sharedPref = getSharedPreferences("MyFile",Context.MODE_PRIVATE);
+        bar = findViewById(R.id.ratingBar);
+        bar.setIsIndicator(true);
+        bar.setNumStars(7);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         filePath = extras.getString("Key");
@@ -253,10 +259,13 @@ public class OutputActivity extends AppCompatActivity {
                         String message = "You earned " + points + " points for trying to recycle!!";
                         pointsText.setText(message);
                     }
+                    if(points >= 14)
+                        bar.setRating(7);
+                    else
+                        bar.setRating(points / 2);
                     currentPoints += points;
                     editor.putInt("currentPoints", currentPoints);
                     editor.commit();
-                    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n" + currentPoints);
 
                 }
                 catch(IOException e)

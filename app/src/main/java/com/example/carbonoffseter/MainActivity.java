@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         int currentPoints = getCurrentPoints();
         TextView currentPointsText = (TextView) findViewById(R.id.currentPointsView);
         String message = "Your current points are " + currentPoints;
-        System.out.println(message);
         currentPointsText.setText(message);
     }
 
