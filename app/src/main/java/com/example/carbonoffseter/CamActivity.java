@@ -248,7 +248,7 @@ public class CamActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }*/
                     //startActivity(intent);
-                    Intent intent = new Intent (CamActivity.this, CamTestActivity.class);
+                    Intent intent = new Intent (CamActivity.this, OutputActivity.class);
                     try {
                         intent.putExtra("Key", file.getCanonicalPath());
                     } catch (IOException e) {
@@ -263,7 +263,6 @@ public class CamActivity extends AppCompatActivity {
                 @Override
                 public void onCaptureStarted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, long timestamp, long frameNumber) {
                     super.onCaptureStarted(session, request, timestamp, frameNumber);
-                    Toast.makeText(getApplicationContext(), "Pic taken", Toast.LENGTH_SHORT).show();
                     try {
                         startCameraPreview();
                     } catch (CameraAccessException e) {

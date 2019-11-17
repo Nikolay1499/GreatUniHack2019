@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.io.IOException;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,8 +30,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button btn_choose_photo = findViewById(R.id.uploadBtn); // Replace with id of your button.
+        Button btn_choose_photo = findViewById(R.id.uploadBtn);
+        Button btn_camera = findViewById(R.id.cameraBtn);
         btn_choose_photo.setOnClickListener(btnChoosePhotoPressed);
+        btn_camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CamActivity.class));
+            }
+        });
     }
 
     public static String getFilePath()
@@ -66,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
                     imageToAnalyse = BitmapFactory.decodeFile(filePath);
                     Intent startIntent =  new Intent(getApplicationContext(), OutputActivity.class);
+                    startIntent.putExtra("Key", filePath);
                     startActivity(startIntent);
                 }
         }

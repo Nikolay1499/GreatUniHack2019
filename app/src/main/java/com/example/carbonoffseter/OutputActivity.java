@@ -43,11 +43,15 @@ public class OutputActivity extends AppCompatActivity {
     private Bitmap image;
     public static ImageView bin_image;
     public static AssetManager assets;
+    public static String filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_output);
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        filePath = extras.getString("Key");
         Button btn = (Button)findViewById(R.id.backButton);
         assets = getAssets();
         btn.setOnClickListener(new View.OnClickListener() {
@@ -59,14 +63,13 @@ public class OutputActivity extends AppCompatActivity {
         OutputActivity.context = getApplicationContext();
         ImageView user_image = findViewById(R.id.imageView);
         bin_image = findViewById(R.id.binImage);
-        image = MainActivity.getImageToAnalyse();
+        image = BitmapFactory.decodeFile(filePath);
         user_image.setImageBitmap(image);
         try {
             readImage();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(MainActivity.getImageToAnalyse());
 
     }
 
@@ -111,7 +114,7 @@ public class OutputActivity extends AppCompatActivity {
             AnnotateImageRequest annotateImageRequest = new AnnotateImageRequest();
             Image base64EncodedImage = new Image();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            Bitmap bitmap = BitmapFactory.decodeFile(MainActivity.getFilePath());
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
             byte[] imageBytes = byteArrayOutputStream.toByteArray();
 
